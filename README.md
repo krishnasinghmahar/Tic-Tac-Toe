@@ -1,5 +1,5 @@
 # Tic-Tac-Toe
-
+[Live Demo](https://krishnasinghmahar.github.io/Tic-Tac-Toe/)
 
 ## Learnings
 - functional approach of programming
