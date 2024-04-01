@@ -1,98 +1,111 @@
-const game = (function createTicTacToe() {
-  function startGame() {
-    let board = [
-      ['', '', ''],
-      ['', '', ''],
-      ['', '', '']
-    ];
-    let currentPlayer = 'X';
-    let movesLeft = 9;
+const ticTacToe = (function () {
+  const buttons = document.querySelectorAll('.btn');
+  const restartBtn = document.getElementById('restartBtn');
+  const h2Tag = document.querySelector('h2');
 
-    function renderBoard() {
-      let boardString = '';
-      for (let row of board) {
-        boardString += ` [${row.join('] [')}] \n`;
-      }
-      alert(`Board:\n${boardString}`);
-    }
 
-    function checkWin() {
-      for (let i = 0; i < 3; i++) {
-        if (board[i][0] !== '' && board[i][0] === board[i][1] && board[i][0] === board[i][2]) {
-          return true; // Row win
-        }
-        if (board[0][i] !== '' && board[0][i] === board[1][i] && board[0][i] === board[2][i]) {
-          return true; // Column win
-        }
-      }
-      if (board[0][0] !== '' && board[0][0] === board[1][1] && board[0][0] === board[2][2]) {
-        return true; // Diagonal win (top-left to bottom-right)
-      }
-      if (board[0][2] !== '' && board[0][2] === board[1][1] && board[0][2] === board[2][0]) {
-        return true; // Diagonal win (top-right to bottom-left)
-      }
-      return false; // No win
-    }
+  let buttonsData = ['', '', '', '', '', '', '', '', ''];
 
-    function playTurn() {
-      let position = prompt(`Player ${currentPlayer}, enter the position of your mark:\n [1] [2] [3]\n [4] [5] [6]\n [7] [8] [9]\n`);
-      if (position === null) {
-        alert('Game cancelled');
+  let currentPlayer = 'X';
+  let movesLeft = 9;
+
+
+  buttons.forEach((button, index) => {
+    button.addEventListener('click', () => {
+      if (button.textContent !== '') {
         return;
       }
 
-      position = +position;
-      if (isNaN(position) || position < 1 || position > 9) {
-        alert('Invalid position. Please enter a number between 1 and 9.');
-        playTurn(); // Repeat turn
+      if (h2Tag.textContent.includes('wins')) {
         return;
       }
 
-      let row = Math.floor((position - 1) / 3);
-      let column = (position - 1) % 3;
+      playTurn(button, index);
+    });
+  });
 
-      if (board[row][column] !== '') {
-        alert('This position is already occupied. Try again.');
-        playTurn(); // Repeat turn
-        return;
-      }
 
-      board[row][column] = currentPlayer;
-      movesLeft--;
+  function playTurn(button, index) {
+    movesLeft--;
+    button.textContent = currentPlayer;
+    currentPlayer = currentPlayer === 'X' ? 'O' : 'X'
+    h2Tag.textContent = `Player '${currentPlayer}' Turn`;
 
-      if (checkWin()) {
-        renderBoard();
-        alert(`Player ${currentPlayer} wins!`);
-        restartGame();
-        return;
-      }
+    buttonsData[index] = button.textContent;
+    console.log(index);
 
-      if (movesLeft === 0) {
-        renderBoard();
-        alert('It\'s a draw!');
-        restartGame();
-        return;
-      }
-
-      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-      renderBoard();
-      playTurn();
-    }
-
-    function restartGame() {
-      let restart = confirm('Do you want to restart the game?');
-      if (restart) {
-        startGame();
-      } else {
-        alert('Game over');
-      }
-    }
-
-    renderBoard();
-    playTurn();
+    winConditions();
   }
 
-  return { startGame};
+  function winConditions() {
+    // Check rows
+    for (let i = 0; i < 9; i += 3) {
+      if (
+        buttonsData[i] !== '' &&
+        buttonsData[i] === buttonsData[i + 1] &&
+        buttonsData[i] === buttonsData[i + 2]
+      ) {
+        h2Tag.textContent = `Player  '${buttonsData[i]} wins!`;
+        return;
+      }
+    }
+
+    // Check columns
+    for (let i = 0; i < 3; i++) {
+      if (
+        buttonsData[i] !== '' &&
+        buttonsData[i] === buttonsData[i + 3] &&
+        buttonsData[i] === buttonsData[i + 6]
+      ) {
+        setTimeout(() => {
+          h2Tag.textContent = `Player  '${buttonsData[i]}' wins!`;
+        }, 1);
+        return;
+      }
+    }
+
+    // Check diagonals
+    if (
+      buttonsData[0] !== '' &&
+      buttonsData[0] === buttonsData[4] &&
+      buttonsData[0] === buttonsData[8]
+    ) {
+      setTimeout(() => {
+        h2Tag.textContent = `Player  '${buttonsData[0]}' wins!`;
+      }, 1);
+      return;
+    }
+
+    if (
+      buttonsData[2] !== '' &&
+      buttonsData[2] === buttonsData[4] &&
+      buttonsData[2] === buttonsData[6]
+    ) {
+      setTimeout(() => {
+        h2Tag.textContent = `Player  '${buttonsData[2]}' wins!`;
+      }, 1);
+      return;
+    }
+
+    // Check for draw
+    if (movesLeft === 0) {
+      setTimeout(() => {
+        h2Tag.textContent = `Game Draw!`;
+      }, 1);
+    }
+  }
+
+  restartBtn.addEventListener('click', resetGame);
+
+  function resetGame() {
+    h2Tag.textContent = `Player 'X' Turn`;
+    buttonsData = ['', '', '', '', '', '', '', '', ''];
+    currentPlayer = 'X';
+    movesLeft = 9;
+    buttons.forEach(button => {
+      button.textContent = '';
+    });
+  }
 })();
 
-game.startGame();
+
